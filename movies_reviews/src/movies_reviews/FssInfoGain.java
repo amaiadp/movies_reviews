@@ -2,14 +2,14 @@ package movies_reviews;
 
 import weka.core.Instances;
 import weka.filters.Filter;
-import weka.filters.supervised.attribute.AttributeSelection;
-//import weka.attributeSelection.AttributeSelection;
+//import weka.filters.supervised.attribute.AttributeSelection;
+import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.InfoGainAttributeEval;
 import weka.attributeSelection.Ranker;
 
 public class FssInfoGain {
 	
-	protected void fssInfoGain(Instances data, String path){
+	public static Instances fssInfoGain(Instances data, String path){
 		Ranker rnk = new Ranker();
 		InfoGainAttributeEval igattreval = new InfoGainAttributeEval();
 		AttributeSelection as = new AttributeSelection();
@@ -21,10 +21,11 @@ public class FssInfoGain {
 			data.setClassIndex(0);
 			as.setInputFormat(data);
 			newData = Filter.useFilter(data, as);
-			ArffKargatu.arffSortu(path, newData);
+			return newData;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		
@@ -35,7 +36,8 @@ public class FssInfoGain {
 		// TODO Auto-generated method stub
 		FssInfoGain infog = new FssInfoGain();
 		try {
-			infog.fssInfoGain(ArffKargatu.instantziakIrakurri(args[0]), args[1]);
+			Instances newData = infog.fssInfoGain(ArffKargatu.instantziakIrakurri(args[0]), args[1]);
+			ArffKargatu.arffSortu(args[1], newData);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

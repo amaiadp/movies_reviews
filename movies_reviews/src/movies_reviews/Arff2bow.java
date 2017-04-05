@@ -9,7 +9,7 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 public class Arff2bow {
 
 	
-	public void bagOfWords(Instances data){
+	public static Instances bagOfWords(Instances data){
 		StringToWordVector filter = new StringToWordVector();
 		filter.setOutputWordCounts(false);
 		filter.setLowerCaseTokens(true);
@@ -23,15 +23,16 @@ public class Arff2bow {
 			e1.printStackTrace();
 		}
 
-		
+
 		try {
 			Instances newdata = Filter.useFilter(data, filter);
-			ArffKargatu.arffSortu("bow.arff", newdata);
+			return newdata;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+
+			return null;
 		}
-		
 		
 		
 	}
@@ -50,12 +51,16 @@ public class Arff2bow {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Arff2bow a = new Arff2bow();
+
+		Instances newdata= null;
 		try {
-			a.bagOfWords(ArffKargatu.instantziakIrakurri("dev.arff"));
+			newdata= a.bagOfWords(ArffKargatu.instantziakIrakurri("train.arff"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		ArffKargatu.arffSortu("bow.arff", newdata);
+
 	}
 
 }
