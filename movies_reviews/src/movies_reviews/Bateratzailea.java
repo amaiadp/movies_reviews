@@ -5,22 +5,27 @@ import weka.core.Instances;
 public class Bateratzailea {
 
 	
-	public void bateratu(Instances train, Instances dev, Instances test){
+	public static Instances bateratu(Instances train, Instances ptest){
+		Instances test = new Instances(ptest);
+		System.out.println("Fitxategiak bateratzen...");
+		System.out.println("Hasierako atributu koprurua: " + train.numAttributes() + " eta " + test.numAttributes());
+		int i =0;
+		while(i<test.numAttributes()){ //trainean ez daudenak kendu
+			if(train.attribute(test.attribute(i).name())==null){
+				test.deleteAttributeAt(i);
+			}else{
+				i++;
+			}
+		}
 		
-		Instances guztiak = new Instances(train);
-		guztiak.addAll(dev);
-		guztiak.addAll(test);
-		
-		Instances guztiakBow = Arff2bow.bagOfWords(guztiak);
-		Instances guztiakIG = FssInfoGain.fssInfoGain(guztiakBow, null);
-		
-		Instances newTrain = new Instances(guztiakIG, 0, train.numInstances());
-		Instances newDev = new Instances(guztiakIG, train.numInstances(), dev.numInstances());
-		Instances newTest = new Instances(guztiakIG, train.numInstances()+ dev.numInstances(), test.numInstances());
+		for(int j=0;j<train.numAttributes();j++){
+			if( test.attribute(train.attribute(j).name()) == null ){
+				test.insertAttributeAt(train.attribute(j), j );
+			}
+		}
+		System.out.println("Amaierako atributu koprurua: train " + train.numAttributes() + " eta test" + test.numAttributes());
 
-		ArffKargatu.arffSortu("TRAIN.aff", newTrain);
-		ArffKargatu.arffSortu("DEV.aff", newDev);
-		ArffKargatu.arffSortu("TEST.aff", newTest);
+		return test;
 	}
 	
 	
@@ -29,7 +34,6 @@ public class Bateratzailea {
 	
 	public static void main(String[] args) {
 		Bateratzailea b = new Bateratzailea();
-		b.bateratu(ArffKargatu.instantziakIrakurri("train.arff"), ArffKargatu.instantziakIrakurri("dev.arff"), ArffKargatu.instantziakIrakurri("test_blind.arff"));
 	}
 
 }

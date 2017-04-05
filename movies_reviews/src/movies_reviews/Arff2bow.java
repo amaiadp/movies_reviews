@@ -10,7 +10,9 @@ public class Arff2bow {
 
 	
 	public static Instances bagOfWords(Instances data){
+		System.out.println(data.relationName() + " fitxategiaren Bag of Words lortzen...");
 		StringToWordVector filter = new StringToWordVector();
+		filter.setWordsToKeep(9999);
 		filter.setOutputWordCounts(false);
 		filter.setLowerCaseTokens(true);
 		filter.setTFTransform(false);
@@ -26,6 +28,7 @@ public class Arff2bow {
 
 		try {
 			Instances newdata = Filter.useFilter(data, filter);
+			System.out.println("Bag of Words amaituta");
 			return newdata;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -36,17 +39,6 @@ public class Arff2bow {
 		
 		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

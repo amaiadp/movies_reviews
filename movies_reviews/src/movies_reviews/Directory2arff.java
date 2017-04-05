@@ -15,12 +15,9 @@ import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 
 public class Directory2arff {
-
 	
-	
-	
-	
-	public void d2arff(String source, String dest){
+	public Instances d2arff(String source){
+		System.out.println(source + " karpetatik instantziak lortzen...");
 		File dir = new File(source);
 		ArrayList<Attribute> atts = new ArrayList<>();
 		ArrayList<String> klaseBalio = new ArrayList<>();
@@ -34,14 +31,8 @@ public class Directory2arff {
 		for(String kar : karpetak){
 			this.instantziakGehitu(source+File.separator+kar, kar, data);
 		}
-		String name;
-		if(dest!=null){
-			name = dest;
-		}
-		else{
-			name = dir.getName()+".arff";
-		}
-		ArffKargatu.arffSortu(name, data);
+		System.out.println("Karga amaituta. "+ data.numInstances()+ " instantzia lortu dira");
+		return data;
 		
 	}
 	
@@ -71,13 +62,6 @@ public class Directory2arff {
 		        String newstr = text.replaceAll("-", " ");
 		        String newstr2 = newstr.replaceAll("[\\x00-\\x1F\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7F]", "");
 		        String zuriGabe = newstr2.replaceAll(" +", " ");
-		        if(i==17){
-		        	System.out.println(text);
-		        	System.out.println("\n\n\n"+newstr);
-		        	System.out.println("\n\n\n"+zuriGabe);
-		        }
-//		        String newstr = text.replaceAll("[\\x20,\\x30-\\x39,\\x41-\\x5A,\\x61-\\x7A]", "");
-//		        String newstr = text.replaceAll("[\\p{ASCII}&&\\P{Alnum}]", "");
 		        newInst[1] = (double)data.attribute(1).addStringValue(zuriGabe);
 		        DenseInstance ins =new DenseInstance(1.0, newInst);
 		        if(klasea==null){
@@ -95,7 +79,8 @@ public class Directory2arff {
 	}
 
 
-	public void blind(String source, String dest){
+	public Instances blind(String source){
+		System.out.println(source + " karpetatik instantziak lortzen...");
 		File dir = new File(source);
 		ArrayList<Attribute> atts = new ArrayList<>();
 		ArrayList<String> klaseBalio = new ArrayList<>();
@@ -106,22 +91,15 @@ public class Directory2arff {
 	    Instances data = new Instances("text_files_in_" + source, atts, 0);
 		
 	    this.instantziakGehitu(source, null, data);
-
-		String name;
-		if(dest!=null){
-			name = dest;
-		}
-		else{
-			name = dir.getName()+".arff";
-		}
-		ArffKargatu.arffSortu(name, data);
+		System.out.println("Karga amaituta. "+ data.numInstances()+ " instantzia lortu dira");
+		return data;
 	}
 
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Directory2arff d = new  Directory2arff();
-		d.d2arff("C:\\Users\\amitx\\Downloads\\movies_reviews\\dev",null);
+		d.d2arff("C:\\Users\\amitx\\Downloads\\movies_reviews\\dev");
 		
 	}
 
