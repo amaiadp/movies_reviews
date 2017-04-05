@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 
 import weka.classifiers.Classifier;
 import weka.core.Instances;
+import weka.core.SerializationHelper;
 
 
 public class Sailkatzailea {
@@ -20,10 +21,7 @@ public class Sailkatzailea {
 	public void sailkatu(String pathModel, String pathTest) throws Exception{
 		
 		//model lortu
-		 ObjectInputStream ois = new ObjectInputStream(
-                 new FileInputStream(pathModel));
-		 Classifier cls = (Classifier) ois.readObject();
-		 ois.close();
+		Classifier cls = (Classifier) SerializationHelper.read(pathModel);
 		 
 		 // load unlabeled data
 		 Instances unlabeled = new Instances(
