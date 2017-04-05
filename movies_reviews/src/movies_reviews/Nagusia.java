@@ -24,6 +24,12 @@ public class Nagusia {
 		
 		Instances trainFSS = FssInfoGain.fssInfoGain(trainbow);
 		
+		Instances devbat = Bateratzailea.bateratu(trainFSS, devbow);
+		Instances testbat = Bateratzailea.bateratu(trainFSS, testbow);
+		
+		ArffKargatu.arffSortu("train.arff", trainFSS);
+		ArffKargatu.arffSortu("dev.arff", devbat);
+		ArffKargatu.arffSortu("test.arff", testbat);
 	}
 
 }

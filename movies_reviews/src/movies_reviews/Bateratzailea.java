@@ -1,6 +1,8 @@
 package movies_reviews;
 
 import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Reorder;
 
 public class Bateratzailea {
 
@@ -8,7 +10,7 @@ public class Bateratzailea {
 	public static Instances bateratu(Instances train, Instances ptest){
 		Instances test = new Instances(ptest);
 		System.out.println("Fitxategiak bateratzen...");
-		System.out.println("Hasierako atributu koprurua: " + train.numAttributes() + " eta " + test.numAttributes());
+		System.out.println("Hasierako atributu koprurua: train " + train.numAttributes() + " eta test " + test.numAttributes());
 		int i =0;
 		while(i<test.numAttributes()){ //trainean ez daudenak kendu
 			if(train.attribute(test.attribute(i).name())==null){
@@ -20,12 +22,22 @@ public class Bateratzailea {
 		
 		for(int j=0;j<train.numAttributes();j++){
 			if( test.attribute(train.attribute(j).name()) == null ){
-				test.insertAttributeAt(train.attribute(j), j );
+				test.insertAttributeAt(train.attribute(j), test.numInstances() );
 			}
 		}
-		System.out.println("Amaierako atributu koprurua: train " + train.numAttributes() + " eta test" + test.numAttributes());
+		Reorder ro = new Reorder();
+		Instances newtest = null;
+		try {
+			ro.setInputFormat(train);
+			newtest = Filter.useFilter(test, ro);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("Amaierako atributu koprurua: train " + train.numAttributes() + " eta test " + newtest.numAttributes());
 
-		return test;
+		return newtest;
 	}
 	
 	
