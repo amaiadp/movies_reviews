@@ -1,5 +1,7 @@
 package movies_reviews;
 
+import java.util.ArrayList;
+
 import weka.core.Instances;
 
 public class Nagusia {
@@ -18,9 +20,17 @@ public class Nagusia {
 		Instances dev = d2a.d2arff(args[1]);
 		Instances test = d2a.blind(args[2]);
 		
-		Instances trainbow = Arff2bow.bagOfWords(train);
-		Instances devbow = Arff2bow.bagOfWords(dev);
-		Instances testbow = Arff2bow.bagOfWords(test);
+//		Instances trainbow = Arff2bow.bagOfWords(train);
+//		Instances devbow = Arff2bow.bagOfWords(dev);
+//		Instances testbow = Arff2bow.bagOfWords(test);
+		
+		ArrayList<Instances> denak = Arff2bow.bagOfWords(train, dev, test);
+		
+		
+		Instances trainbow = denak.get(0);
+		Instances devbow = denak.get(1);
+		Instances testbow= denak.get(2);
+		
 		
 		Instances trainFSS = FssInfoGain.fssInfoGain(trainbow);
 		

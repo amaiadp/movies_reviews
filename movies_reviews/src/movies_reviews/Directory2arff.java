@@ -99,8 +99,8 @@ public class Directory2arff {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Directory2arff d = new  Directory2arff();
-		d.d2arff("C:\\Users\\amitx\\Downloads\\movies_reviews\\dev");
-		
+		Instances data = d.d2arff("C:\\Users\\amitx\\Downloads\\movies_reviews\\dev");
+		ArffKargatu.arffSortu("devHASIERA.arff", data);
 	}
 
 }

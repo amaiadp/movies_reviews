@@ -2,12 +2,15 @@ package movies_reviews;
 
 import weka.core.Instances;
 import weka.filters.Filter;
-import weka.filters.supervised.attribute.AttributeSelection;
-//import weka.attributeSelection.AttributeSelection;
+import weka.filters.unsupervised.attribute.Remove;
+//import weka.filters.supervised.attribute.AttributeSelection;
+import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.InfoGainAttributeEval;
 import weka.attributeSelection.Ranker;
 
 public class FssInfoGain {
+	
+	public static int[] selectedAttributes;
 	
 	public static Instances fssInfoGain(Instances data){
 		Ranker rnk = new Ranker();
@@ -19,8 +22,13 @@ public class FssInfoGain {
 		Instances newData;
 		try {
 			data.setClassIndex(0);
-			as.setInputFormat(data);
-			newData = Filter.useFilter(data, as);
+			as.SelectAttributes(data);
+			selectedAttributes = as.selectedAttributes();
+			Remove remove = new Remove();
+			remove.setAttributeIndicesArray(selectedAttributes); // atributu onak pasatzen diogu, gorde nahi ditugunak
+			remove.setInvertSelection(true); // beraz, invert egitean gordetako atributuak ez ezik, besteak kentzen ditugu.
+			remove.setInputFormat(data);
+			newData = Filter.useFilter(data, remove);
 			return newData;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
