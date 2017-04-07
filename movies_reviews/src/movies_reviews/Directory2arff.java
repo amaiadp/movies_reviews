@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -28,9 +29,11 @@ public class Directory2arff {
 	    Instances data = new Instances("text_files_in_" + source, atts, 0);
 		
 		String[] karpetak = dir.list();
-		for(String kar : karpetak){
-			this.instantziakGehitu(source+File.separator+kar, kar, data);
-		}
+//		for(String kar : karpetak){
+//			this.instantziakGehitu(source+File.separator+kar, kar, data);
+//		}
+		this.instantziakGehitu(source+File.separator+"neg", "neg", data);
+		this.instantziakGehitu(source+File.separator+"pos", "pos", data);
 		System.out.println("Karga amaituta. "+ data.numInstances()+ " instantzia lortu dira");
 		return data;
 		
@@ -43,7 +46,9 @@ public class Directory2arff {
 	private Instances instantziakGehitu(String source, String klasea, Instances data) {
 		File karpeta = new File(source);
 		int i =0;
-		for(String fiIzena : karpeta.list()){
+		String[] lista = karpeta.list();
+		Arrays.sort(lista);
+		for(String fiIzena : lista){
 			i++;
 			double[] newInst = new double[2];
 			if(klasea!=null){
@@ -99,7 +104,7 @@ public class Directory2arff {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Directory2arff d = new  Directory2arff();
-		Instances data = d.d2arff("C:\\Users\\amitx\\Downloads\\movies_reviews\\dev");
+		Instances data = d.d2arff("/home/amaia/movies_reviews/dev");
 		ArffKargatu.arffSortu("devHASIERA.arff", data);
 	}
 
