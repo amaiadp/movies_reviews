@@ -17,9 +17,7 @@ public class Inferentzia {
 		RandomForest params = ParametroEkorketa.parametroEkorketa(train, dev, clas);
 		String[] opt = params.getOptions();
 		System.out.println("Sortuko den modeloaren parametroak: ");
-		for (String op:opt){
-			System.out.println(op);
-		}
+		ParametroEkorketa.inprimatumk(opt);
 		RandomForest rf = new RandomForest();
 		try {
 			rf.setOptions(opt);
@@ -30,22 +28,45 @@ public class Inferentzia {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 	
-	public static void inferentziaNB(Instances train, Instances dev, Instances traindev, int clas){
+	public static void inferentziaNB(Instances traindev, int clas){
 		NaiveBayes nb = new NaiveBayes();
 		ArffKargatu.arffSortu("traindev.arff", traindev);
-		sortuModeloa(nb, "NaiveBayes.model");
-		ebaluatu(nb, traindev, clas);
 		try {
+			System.out.println(nb.toString());
+			ebaluatuNB(traindev, clas);
 			nb.buildClassifier(traindev);
+			sortuModeloa(nb, "NaiveBayes.model");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	private static void ebaluatuNB(Instances traindev, int clas) {
+		Evaluation eval;
+		try {
+			System.out.println("Klase minoritarioa: "+ clas);
+			NaiveBayes nb = new NaiveBayes();
+			System.out.println("NaiveBayes ezzintzoa:");
+			ezzintzoa(nb, traindev, clas);
+			nb = new NaiveBayes();
+			System.out.println("NaiveBayes 10 cross:");
+			tencross(nb, traindev, clas);
+			nb = new NaiveBayes();
+			System.out.println("NaiveBayes hold out:");
+			holdout(nb,traindev, clas);
+			
+			 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+		
+
 	public static Instances sortuTrainDev(Instances train, Instances dev){
 		Instances traindev = new Instances(train);
 		for (int i = 0; i<dev.numInstances(); i++){
@@ -63,18 +84,24 @@ public class Inferentzia {
 			e.printStackTrace();
 		}
 		
-	}
+	}	
 	
-	
-	public static void ebaluatu(Classifier cl, Instances traindev, int clas){
-		Evaluation eval;
-		
+	public static void ebaluatu(RandomForest cl, Instances traindev, int clas){
 		try {
 			System.out.println(cl.toString());
 			System.out.println("Klase minoritarioa: "+ clas);
-			ezzintzoa(cl, traindev, clas);
-			tencross(cl, traindev, clas);
-			holdout(cl,traindev, clas);
+			RandomForest rf = new RandomForest();
+			rf.setOptions(cl.getOptions());
+			System.out.println("RandomForest ezzintzoa:");
+			ezzintzoa(rf, traindev, clas);
+			rf = new RandomForest();
+			rf.setOptions(cl.getOptions());
+			System.out.println("RandomForest 10 cross validation:");
+			tencross(rf, traindev, clas);
+			rf = new RandomForest();
+			rf.setOptions(cl.getOptions());
+			System.out.println("RandomForest hold out:");
+			holdout(rf,traindev, clas);
 			
 			 
 		} catch (Exception e) {
@@ -85,7 +112,6 @@ public class Inferentzia {
 	}
 	
 	private static void holdout(Classifier cl, Instances data, int clas){
-		Classifier cl1 = cl;
 		try{
 			//Hold-out
 			data.randomize(new Random(4));
@@ -98,7 +124,7 @@ public class Inferentzia {
 	        rp.setPercentage(70);
 	        rp.setInputFormat(data);
 	        Instances test = Filter.useFilter(data, rp);
-	        cl1.buildClassifier(train);
+	        cl.buildClassifier(train);
 	        Evaluation eval = new Evaluation(train);
 	        eval.evaluateModel(cl, test);
 			inprimatu("hold-out",eval,data, clas);	
@@ -109,10 +135,9 @@ public class Inferentzia {
 	
 	private static void tencross(Classifier cl, Instances data, int clas) {
 		Evaluation eval;
-		Classifier cl1 = cl;
 		try {
 			eval = new Evaluation(data);
-			cl1.buildClassifier(data);
+			cl.buildClassifier(data);
 			eval.crossValidateModel(cl, data, 10, new Random(4));
 			inprimatu("10-cross validation",eval,data, clas);
 		} catch (Exception e) {
@@ -126,10 +151,9 @@ public class Inferentzia {
 
 	private static void ezzintzoa(Classifier cl, Instances data, int clas){
 		Evaluation eval;
-		Classifier cl1 = cl;
 		try {
 			eval = new Evaluation(data);
-			cl1.buildClassifier(data);
+			cl.buildClassifier(data);
 			eval.evaluateModel(cl, data);
 			inprimatu("ez-zintzoa",eval,data, clas);
 		} catch (Exception e) {
@@ -144,5 +168,17 @@ public class Inferentzia {
 		System.out.println("Recall: " +eval.recall(clas));
 		System.out.println("Acc: "+eval.pctCorrect());
 		
+	}
+	public static void main(String[] args) {
+		try {
+			Instances train = ArffKargatu.instantziakIrakurri(args[0]);
+			int clas = ParametroEkorketa.lortuKlaseMinoritarioa(train);
+			Instances dev = ArffKargatu.instantziakIrakurri(args[1]);
+			Instances traindev = Inferentzia.sortuTrainDev(train, dev);
+			Inferentzia.inferentziaNB(traindev, clas);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

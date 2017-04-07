@@ -19,9 +19,8 @@ public class ParametroEkorketa {
 		double fm;
 		
 		train.setClass(train.attribute("klasea"));		
-		
 		for (double m = 10; m<=100; m=m+10 ){
-			for (int attr = 20; attr <=train.numAttributes()/2; attr=attr+20){
+			for (int attr = 1; attr <=train.numAttributes(); attr=attr+train.numAttributes()/10){
 				RandomForest orain = new RandomForest();
 				try {
 					String[] options = weka.core.Utils.splitOptions("-M "+m+" -K "+attr);
@@ -66,9 +65,8 @@ public class ParametroEkorketa {
 			dev.setClass(dev.attribute("klasea"));
 			Evaluation eval= new Evaluation(train);
 			eval.evaluateModel(classifier, dev);
-			System.out.println("Klase minoritarioa: "+ clas);
 			double fm =eval.fMeasure(clas) ;
-			System.out.println("F-measure: "+fm);
+			System.out.println("      F-measure: "+fm+ "\n");
 			return fm;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -77,17 +75,19 @@ public class ParametroEkorketa {
 		return -1;
 	}
 
-	private static void inprimatumk(String[] op) {
+	public static void inprimatumk(String[] op) {
+		String k ="      ";
 		for (int i=0; i<op.length-1; i++){
 			if(op[i].equals("-K")){
-				System.out.println("K: "+op[i+1]);
+				k = k+"K:"+op[i+1]+", ";
 			}
 			else{
 				if(op[i].equals("-M")){
-					System.out.println("M: "+op[i+1]);
+					k = k+" M:"+op[i+1];
 				}
 			}
 		}
+		System.out.println(k);
 		
 	}
 	
