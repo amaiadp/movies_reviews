@@ -18,7 +18,7 @@ public class Sailkatzailea {
 
 	
 
-	public void sailkatu(String pathModel, String pathTest) throws Exception{
+	public static void sailkatu(String pathModel, String pathTest) throws Exception{
 		
 		//model lortu
 		Classifier cls = (Classifier) SerializationHelper.read(pathModel);
@@ -41,15 +41,11 @@ public class Sailkatzailea {
 		 }
 		 // save labeled data
 		 BufferedWriter writer = new BufferedWriter(
-		                           new FileWriter(""));
+		                           new FileWriter("test.predictions.arff"));
 		 writer.write(labeled.toString());
 		 writer.newLine();
 		 writer.flush();
 		 writer.close();
-	}
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
