@@ -18,7 +18,7 @@ public class ParametroEkorketa {
 		double maxfm = -1;
 		double fm;
 		
-		train.setClassIndex(train.numAttributes()-1);		
+		train.setClass(train.attribute("klasea"));		
 		
 		for (double m = 10; m<=100; m=m+10 ){
 			for (int attr = 20; attr <=train.numAttributes()/2; attr=attr+20){
@@ -46,7 +46,7 @@ public class ParametroEkorketa {
 	public static int lortuKlaseMinoritarioa(Instances train){
 		int[] klas = new int[2];
 		Double clas;
-		train.setClassIndex(train.numAttributes()-1);;
+		train.setClass(train.attribute("klasea"));;
 		for(Instance i: train){
 			clas = i.classValue();
 			klas[clas.intValue()] = klas[clas.intValue()] + 1;
@@ -60,19 +60,35 @@ public class ParametroEkorketa {
 	public static double ebaluatu(RandomForest classifier, Instances train, Instances dev, int clas){
 		try {
 			System.out.println("Evaluating the Classifier with these options: ");
-			System.out.println(classifier.toString());
-			train.setClassIndex(train.numAttributes()-1);
-			dev.setClassIndex(dev.numAttributes()-1);
+			String[] op= classifier.getOptions();
+			inprimatumk(op);
+			train.setClass(train.attribute("klasea"));
+			dev.setClass(dev.attribute("klasea"));
 			Evaluation eval= new Evaluation(train);
 			eval.evaluateModel(classifier, dev);
+			System.out.println("Klase minoritarioa: "+ clas);
 			double fm =eval.fMeasure(clas) ;
 			System.out.println("F-measure: "+fm);
-			return fm ;
+			return fm;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return -1;
+	}
+
+	private static void inprimatumk(String[] op) {
+		for (int i=0; i<op.length-1; i++){
+			if(op[i].equals("-K")){
+				System.out.println("K: "+op[i+1]);
+			}
+			else{
+				if(op[i].equals("-M")){
+					System.out.println("M: "+op[i+1]);
+				}
+			}
+		}
+		
 	}
 	
 	

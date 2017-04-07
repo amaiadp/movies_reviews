@@ -17,10 +17,13 @@ public class Nagusia {
 		
 		try {
 			Instances train = ArffKargatu.instantziakIrakurri(args[0]);
+			train.setClass(train.attribute("klasea"));
 			int classindex = ParametroEkorketa.lortuKlaseMinoritarioa(train);
 			Instances dev = ArffKargatu.instantziakIrakurri(args[1]);
-			Inferentzia.inferentzia(train, dev,classindex);
-			Inferentzia.inferentziaNB(train, dev, classindex);
+			dev.setClass(dev.attribute("klasea"));
+			Instances traindev = Inferentzia.sortuTrainDev(train, dev);
+			Inferentzia.inferentzia(train, dev,traindev, classindex);
+			Inferentzia.inferentziaNB(train, dev,traindev, classindex);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

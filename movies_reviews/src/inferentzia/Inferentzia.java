@@ -2,6 +2,7 @@ package inferentzia;
 
 import java.util.Random;
 
+import movies_reviews.ArffKargatu;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -12,19 +13,18 @@ import weka.filters.unsupervised.instance.RemovePercentage;
 
 public class Inferentzia {
 
-	public static void inferentzia(Instances train, Instances dev,int clas){
+	public static void inferentzia(Instances train, Instances dev, Instances traindev, int clas){
 		RandomForest params = ParametroEkorketa.parametroEkorketa(train, dev, clas);
 		String[] opt = params.getOptions();
 		System.out.println("Sortuko den modeloaren parametroak: ");
 		for (String op:opt){
 			System.out.println(op);
 		}
-		Instances train_dev = sortuTrainDev(train,dev);
 		RandomForest rf = new RandomForest();
 		try {
 			rf.setOptions(opt);
-			rf.buildClassifier(train_dev);
-			ebaluatu(rf, train_dev, clas);
+			ebaluatu(rf, traindev, clas);
+			rf.buildClassifier(traindev);
 			sortuModeloa(rf, "RandomForest.model");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -33,9 +33,9 @@ public class Inferentzia {
 
 	}
 	
-	public static void inferentziaNB(Instances train, Instances dev, int clas){
+	public static void inferentziaNB(Instances train, Instances dev, Instances traindev, int clas){
 		NaiveBayes nb = new NaiveBayes();
-		Instances traindev = sortuTrainDev(train, dev);
+		ArffKargatu.arffSortu("traindev.arff", traindev);
 		try {
 			nb.buildClassifier(traindev);
 		} catch (Exception e) {
@@ -51,7 +51,7 @@ public class Inferentzia {
 		for (int i = 0; i<dev.numInstances(); i++){
 			traindev.add(dev.instance(i));
 		}
-		traindev.setClassIndex(traindev.numAttributes()-1);
+		traindev.setClass(traindev.attribute("klasea"));
 		return traindev;
 	}
 	
@@ -66,52 +66,83 @@ public class Inferentzia {
 	}
 	
 	
-	public static void ebaluatu(Classifier cl, Instances data, int clas){
+	public static void ebaluatu(Classifier cl, Instances traindev, int clas){
 		Evaluation eval;
-		data.setClassIndex(data.numAttributes()-1);
+		
 		try {
+			System.out.println(cl.toString());
+			System.out.println("Klase minoritarioa: "+ clas);
+			ezzintzoa(cl, traindev, clas);
+			tencross(cl, traindev, clas);
+			holdout(cl,traindev, clas);
 			
-			//Ez-zintzoa
-			eval = new Evaluation(data);
-			eval.evaluateModel(cl, data);
-			inprimatu("ez-zintzoa",eval,data, clas);
-			
-			//10-cross validation
-			eval = new Evaluation(data);
-			eval.crossValidateModel(cl, data, 10, new Random(4));
-			inprimatu("10-cross validation",eval,data, clas);
-			
-			//Hold-out
-			data.randomize(new Random(4));
-//			int trainSize = (int) Math.round(data.numInstances() * 0.7);
-//			int testSize = data.numInstances() - trainSize;
-//			Instances train = new Instances(data, 0, trainSize);
-//			Instances test = new Instances(data, trainSize, testSize);
-			//train
-			RemovePercentage rp = new RemovePercentage();
-			rp.setInputFormat(data);
-			rp.setPercentage(70);
-			rp.setInvertSelection(true);
-			Instances train = Filter.useFilter(data, rp);
-			//test
-			rp = new RemovePercentage();
-	        rp.setPercentage(70);
-	        rp.setInputFormat(data);
-	        Instances test = Filter.useFilter(data, rp);
-	        eval = new Evaluation(train);
-	        eval.evaluateModel(cl, test);
-			inprimatu("hold-out",eval,data, clas);	 
+			 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
+	
+	private static void holdout(Classifier cl, Instances data, int clas){
+		Classifier cl1 = cl;
+		try{
+			//Hold-out
+			data.randomize(new Random(4));
+			RemovePercentage rp = new RemovePercentage();
+			rp.setInputFormat(data);
+			rp.setPercentage(70);
+			rp.setInvertSelection(true);
+			Instances train = Filter.useFilter(data, rp);
+			rp = new RemovePercentage();
+	        rp.setPercentage(70);
+	        rp.setInputFormat(data);
+	        Instances test = Filter.useFilter(data, rp);
+	        cl1.buildClassifier(train);
+	        Evaluation eval = new Evaluation(train);
+	        eval.evaluateModel(cl, test);
+			inprimatu("hold-out",eval,data, clas);	
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	private static void tencross(Classifier cl, Instances data, int clas) {
+		Evaluation eval;
+		Classifier cl1 = cl;
+		try {
+			eval = new Evaluation(data);
+			cl1.buildClassifier(data);
+			eval.crossValidateModel(cl, data, 10, new Random(4));
+			inprimatu("10-cross validation",eval,data, clas);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//10-cross validation
+		
+		
+	}
+
+	private static void ezzintzoa(Classifier cl, Instances data, int clas){
+		Evaluation eval;
+		Classifier cl1 = cl;
+		try {
+			eval = new Evaluation(data);
+			cl1.buildClassifier(data);
+			eval.evaluateModel(cl, data);
+			inprimatu("ez-zintzoa",eval,data, clas);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private static void inprimatu(String string, Evaluation eval, Instances data, int clas) {
 		System.out.println("F-measure: " +eval.fMeasure(clas));
 		System.out.println("Precision: "+ eval.precision(clas));
 		System.out.println("Recall: " +eval.recall(clas));
+		System.out.println("Acc: "+eval.pctCorrect());
 		
 	}
 }
