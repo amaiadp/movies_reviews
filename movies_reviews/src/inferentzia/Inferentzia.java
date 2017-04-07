@@ -13,7 +13,7 @@ import weka.filters.unsupervised.instance.RemovePercentage;
 public class Inferentzia {
 
 	public static void inferentzia(Instances train, Instances dev,int clas){
-		RandomForest params = ParametroEkorketa.parametroEkorketa(train, dev);
+		RandomForest params = ParametroEkorketa.parametroEkorketa(train, dev, clas);
 		String[] opt = params.getOptions();
 		System.out.println("Sortuko den modeloaren parametroak: ");
 		for (String op:opt){

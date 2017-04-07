@@ -13,7 +13,7 @@ import weka.classifiers.bayes.NaiveBayes;
 
 public class ParametroEkorketa {
 
-	public static RandomForest parametroEkorketa(Instances train, Instances dev){
+	public static RandomForest parametroEkorketa(Instances train, Instances dev, int clas){
 		RandomForest max = new RandomForest();
 		double maxfm = -1;
 		double fm;
@@ -28,7 +28,7 @@ public class ParametroEkorketa {
 					orain.setOptions(options);
 					orain.setSeed(4);
 					orain.buildClassifier(train);
-					fm = ebaluatu(orain, train, dev);
+					fm = ebaluatu(orain, train, dev, clas);
 					if(fm>maxfm){
 						max = orain;
 						maxfm = fm;
@@ -57,7 +57,7 @@ public class ParametroEkorketa {
 		return 0;
 	}
 	
-	public static double ebaluatu(RandomForest classifier, Instances train, Instances dev){
+	public static double ebaluatu(RandomForest classifier, Instances train, Instances dev, int clas){
 		try {
 			System.out.println("Evaluating the Classifier with these options: ");
 			System.out.println(classifier.toString());
@@ -65,7 +65,7 @@ public class ParametroEkorketa {
 			dev.setClassIndex(dev.numAttributes()-1);
 			Evaluation eval= new Evaluation(train);
 			eval.evaluateModel(classifier, dev);
-			double fm =eval.fMeasure(0) ;
+			double fm =eval.fMeasure(clas) ;
 			System.out.println("F-measure: "+fm);
 			return fm ;
 		} catch (Exception e) {
