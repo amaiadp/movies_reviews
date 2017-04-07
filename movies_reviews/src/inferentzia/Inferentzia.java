@@ -36,14 +36,14 @@ public class Inferentzia {
 	public static void inferentziaNB(Instances train, Instances dev, Instances traindev, int clas){
 		NaiveBayes nb = new NaiveBayes();
 		ArffKargatu.arffSortu("traindev.arff", traindev);
+		sortuModeloa(nb, "NaiveBayes.model");
+		ebaluatu(nb, traindev, clas);
 		try {
 			nb.buildClassifier(traindev);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		sortuModeloa(nb, "NaiveBayes.model");
-		ebaluatu(nb, traindev, clas);
 	}
 	
 	public static Instances sortuTrainDev(Instances train, Instances dev){
