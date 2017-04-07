@@ -46,7 +46,7 @@ public class ParametroEkorketa {
 	public static int lortuKlaseMinoritarioa(Instances train){
 		int[] klas = new int[2];
 		Double clas;
-		train.setClass(train.attribute("klasea"));
+		train.setClassIndex(train.numAttributes()-1);;
 		for(Instance i: train){
 			clas = i.classValue();
 			klas[clas.intValue()] = klas[clas.intValue()] + 1;

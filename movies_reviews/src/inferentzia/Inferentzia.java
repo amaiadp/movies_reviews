@@ -51,6 +51,7 @@ public class Inferentzia {
 		for (int i = 0; i<dev.numInstances(); i++){
 			traindev.add(dev.instance(i));
 		}
+		traindev.setClassIndex(traindev.numAttributes()-1);
 		return traindev;
 	}
 	
