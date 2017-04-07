@@ -19,6 +19,7 @@ public class FssInfoGain {
 		InfoGainAttributeEval igattreval = new InfoGainAttributeEval();
 		AttributeSelection as = new AttributeSelection();
 		rnk.setThreshold(0.0);
+		rnk.setNumToSelect(data.numInstances()/10);
 		as.setSearch(rnk);
 		as.setEvaluator(igattreval);
 		Instances newData;
@@ -43,7 +44,7 @@ public class FssInfoGain {
 	
 	public static Instances TFIDF(Instances data){
 		StringToWordVector filter = new StringToWordVector();
-		filter.setWordsToKeep(1000);
+		filter.setWordsToKeep(data.numInstances()/10);
 		filter.setOutputWordCounts(true);
 		filter.setLowerCaseTokens(true);
 		filter.setTFTransform(true);

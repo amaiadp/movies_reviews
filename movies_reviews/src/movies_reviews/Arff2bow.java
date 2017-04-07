@@ -15,7 +15,7 @@ public class Arff2bow {
 	public static Instances bagOfWords(Instances data){
 		System.out.println(data.relationName() + " fitxategiaren Bag of Words lortzen...");
 		StringToWordVector filter = new StringToWordVector();
-		filter.setWordsToKeep(1000);
+		filter.setWordsToKeep(Integer.MAX_VALUE);
 		filter.setOutputWordCounts(false);
 		filter.setLowerCaseTokens(true);
 		filter.setTFTransform(false);
@@ -60,7 +60,7 @@ public class Arff2bow {
 		ArrayList<Instances> erantzuna = new ArrayList<Instances>();
 		
 		StringToWordVector filter = new StringToWordVector();
-		filter.setWordsToKeep(1000);
+		filter.setWordsToKeep(Integer.MAX_VALUE);
 		filter.setOutputWordCounts(false);
 		filter.setLowerCaseTokens(true);
 		filter.setTFTransform(false);
