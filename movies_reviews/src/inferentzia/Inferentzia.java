@@ -12,7 +12,7 @@ import weka.filters.unsupervised.instance.RemovePercentage;
 
 public class Inferentzia {
 
-	public static void inferentzia(Instances train, Instances dev, String model, int clas){
+	public static void inferentzia(Instances train, Instances dev,int clas){
 		RandomForest params = ParametroEkorketa.parametroEkorketa(train, dev);
 		String[] opt = params.getOptions();
 		System.out.println("Sortuko den modeloaren parametroak: ");
@@ -25,7 +25,7 @@ public class Inferentzia {
 			rf.setOptions(opt);
 			rf.buildClassifier(train_dev);
 			ebaluatu(rf, train_dev, clas);
-			sortuModeloa(rf, model);
+			sortuModeloa(rf, "RandomForest.model");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -33,7 +33,7 @@ public class Inferentzia {
 
 	}
 	
-	public static void inferentziaNB(Instances train, Instances dev, String model, int clas){
+	public static void inferentziaNB(Instances train, Instances dev, int clas){
 		NaiveBayes nb = new NaiveBayes();
 		Instances traindev = sortuTrainDev(train, dev);
 		try {
@@ -42,7 +42,7 @@ public class Inferentzia {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		sortuModeloa(nb, model);
+		sortuModeloa(nb, "NaiveBayes.model");
 		ebaluatu(nb, traindev, clas);
 	}
 	

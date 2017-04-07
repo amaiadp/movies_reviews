@@ -7,10 +7,10 @@ import weka.core.Instances;
 public class Nagusia {
 
 	public static void main(String[] args) {
-		if(args.length !=3){
+		if(args.length !=2){
 			System.out.println("Pasatutako parametroak okerrak dira.");
 			System.out.println("Honako agindu hau erabili.");
-			System.out.println("java -jar Inferentzia.jar /path/to/train.arff /path/to/dev.arff /path/to/model");
+			System.out.println("java -jar GetModel.jar /path/to/train.arff /path/to/dev.arff");
 			System.out.println();
 			System.exit(-1);
 		}
@@ -19,8 +19,8 @@ public class Nagusia {
 			Instances train = ArffKargatu.instantziakIrakurri(args[0]);
 			int classindex = ParametroEkorketa.lortuKlaseMinoritarioa(train);
 			Instances dev = ArffKargatu.instantziakIrakurri(args[1]);
-			Inferentzia.inferentzia(train, dev, args[2],classindex);
-			Inferentzia.inferentziaNB(train, dev, args[2], classindex);
+			Inferentzia.inferentzia(train, dev,classindex);
+			Inferentzia.inferentziaNB(train, dev, classindex);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
