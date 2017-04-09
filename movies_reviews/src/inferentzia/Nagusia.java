@@ -1,6 +1,6 @@
 package inferentzia;
 
-import movies_reviews.ArffKargatu;
+import aurreProzesamendu.ArffKargatu;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 

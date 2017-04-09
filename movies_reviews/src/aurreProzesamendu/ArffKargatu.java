@@ -1,4 +1,4 @@
-package movies_reviews;
+package aurreProzesamendu;
 
 import java.io.File;
 import java.io.FileReader;

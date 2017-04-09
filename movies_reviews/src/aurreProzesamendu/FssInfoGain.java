@@ -1,10 +1,13 @@
-package movies_reviews;
+package aurreProzesamendu;
 
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 import weka.filters.unsupervised.instance.SparseToNonSparse;
+
+import java.util.ArrayList;
+
 //import weka.filters.supervised.attribute.AttributeSelection;
 import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.InfoGainAttributeEval;
@@ -15,6 +18,7 @@ public class FssInfoGain {
 	public static int[] selectedAttributes;
 	
 	public static Instances fssInfoGain(Instances data){
+		data.setClass(data.attribute("klasea"));
 		Ranker rnk = new Ranker();
 		InfoGainAttributeEval igattreval = new InfoGainAttributeEval();
 		AttributeSelection as = new AttributeSelection();
@@ -24,7 +28,6 @@ public class FssInfoGain {
 		as.setEvaluator(igattreval);
 		Instances newData;
 		try {
-			data.setClassIndex(0);
 			as.SelectAttributes(data);
 			selectedAttributes = as.selectedAttributes();
 			Remove remove = new Remove();
@@ -42,16 +45,26 @@ public class FssInfoGain {
 		
 	}
 	
-	public static Instances TFIDF(Instances data){
+	public static ArrayList<Instances> TFIDF(Instances train, Instances dev, Instances test){
+		train.setClass(train.attribute("klasea"));
+		dev.setClass(dev.attribute("klasea"));
+		test.setClass(test.attribute("klasea"));
+		Instances denak = new Instances(train);
+		denak.addAll(dev);
+		denak.addAll(test);
+		ArrayList<Instances> erantzuna = new ArrayList<Instances>();
+		
+		
 		StringToWordVector filter = new StringToWordVector();
-		filter.setWordsToKeep(data.numInstances()/10);
+		filter.setDoNotOperateOnPerClassBasis(true);
+		filter.setWordsToKeep(denak.numInstances()/10);
 		filter.setOutputWordCounts(true);
 		filter.setLowerCaseTokens(true);
 		filter.setTFTransform(true);
 		filter.setIDFTransform(true);
 		filter.setMinTermFreq(1);
 		try {
-			filter.setInputFormat(data);
+			filter.setInputFormat(denak);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -61,7 +74,7 @@ public class FssInfoGain {
 		Instances databow=null;
 		
 		try {
-			databow = Filter.useFilter(data, filter);
+			databow = Filter.useFilter(denak, filter);
 			System.out.println("Bag of Words amaituta");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -78,19 +91,18 @@ public class FssInfoGain {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return dataNS;
+		Instances newTrain = new Instances(dataNS, 0, train.numInstances());
+		Instances newDev = new Instances(dataNS,  train.numInstances(),dev.numInstances());
+		Instances newTest = new Instances(dataNS, train.numInstances()+dev.numInstances(), test.numInstances());
+		
+		erantzuna.add(newTrain);
+		erantzuna.add(newDev);
+		erantzuna.add(newTest);
+		return erantzuna;
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		FssInfoGain infog = new FssInfoGain();
-		try {
-			Instances newData = infog.fssInfoGain(ArffKargatu.instantziakIrakurri(args[0]));
-			ArffKargatu.arffSortu(args[1], newData);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		
 	}
 }

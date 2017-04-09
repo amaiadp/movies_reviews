@@ -1,4 +1,4 @@
-package movies_reviews;
+package aurreProzesamendu;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +18,8 @@ import weka.core.converters.ArffSaver;
 public class Directory2arff {
 	
 	public Instances d2arff(String source){
+		//source-ak barruan bi karpeta: neg eta pos
+		//neg eta pos barruan testu fitxategiak
 		System.out.println(source + " karpetatik instantziak lortzen...");
 		File dir = new File(source);
 		ArrayList<Attribute> atts = new ArrayList<>();
@@ -29,7 +31,7 @@ public class Directory2arff {
 	    Instances data = new Instances("text_files_in_" + source, atts, 0);
 		
 		String[] karpetak = dir.list();
-//		for(String kar : karpetak){
+//		for(String kar : karpetak){ //ubuntun eta windowsen ez ditu arff berdinak sortzen
 //			this.instantziakGehitu(source+File.separator+kar, kar, data);
 //		}
 		this.instantziakGehitu(source+File.separator+"neg", "neg", data);
@@ -44,6 +46,8 @@ public class Directory2arff {
 	
 	
 	private Instances instantziakGehitu(String source, String klasea, Instances data) {
+		//Source karpetan testu fitxategiak egon behar dira.
+		//Irteera datari sourceko fitxategiko instantzi bat gehituko zaio klase classearekin
 		File karpeta = new File(source);
 		int i =0;
 		String[] lista = karpeta.list();
@@ -85,6 +89,8 @@ public class Directory2arff {
 
 
 	public Instances blind(String source){
+		//Source karpetan testu fitxategiak daude
+		//Irteera: Instances bat non testu bakoitza instantzia bat den eta klasea ezezaguna(?)
 		System.out.println(source + " karpetatik instantziak lortzen...");
 		File dir = new File(source);
 		ArrayList<Attribute> atts = new ArrayList<>();
@@ -102,10 +108,35 @@ public class Directory2arff {
 
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		if(args.length !=2){
+			System.out.println("Pasatutako parametroak okerrak dira.");
+			System.out.println("Honako agindu hau erabili.");
+			System.out.println("java -jar getARFF.jar /path/to/folder <blind>");
+			System.out.println("<blind>: blind bada idatzi 1, bestela 0");
+			System.out.println();
+			System.exit(-1);
+		}
 		Directory2arff d = new  Directory2arff();
-		Instances data = d.d2arff("/home/amaia/movies_reviews/dev");
-		ArffKargatu.arffSortu("devHASIERA.arff", data);
+
+		if(args[1].equals("1")){
+			String[] pathZati = args[0].split(File.separator);
+			Instances data = d.blind(args[0]);
+			ArffKargatu.arffSortu(pathZati[pathZati.length-1], data);
+		}else{
+			if(args[1].equals("0")){
+				String[] pathZati = args[0].split(File.separator);
+				Instances data = d.d2arff(args[0]);
+				ArffKargatu.arffSortu(pathZati[pathZati.length-1], data);
+			}else{
+				System.out.println("Pasatutako parametroak okerrak dira.");
+				System.out.println("Honako agindu hau erabili.");
+				System.out.println("java -jar getARFF.jar /path/to/folder <blind>");
+				System.out.println("<blind>: blind bada idatzi 1, bestela 0");
+				System.out.println();
+				System.exit(-1);
+			}
+			
+		}
 	}
 
 }

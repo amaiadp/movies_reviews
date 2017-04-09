@@ -1,6 +1,7 @@
-package movies_reviews;
+package aurreProzesamendu;
 
 import weka.core.Instances;
+import weka.datagenerators.Test;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.attribute.Reorder;
@@ -9,6 +10,7 @@ public class Bateratzailea {
 
 	
 //	public static Instances bateratu(Instances train, Instances ptest){
+//		//Reorder ez dabil ondo, atributuak ondo hartzen dituela dirudi baina wekan bateraezinak edo direla dio	
 //		train.setClass(train.attribute("klasea"));
 //		ptest.setClass(ptest.attribute("klasea"));
 //
@@ -56,6 +58,10 @@ public class Bateratzailea {
 //	}
 	
 	public static Instances bateratu(Instances train, Instances ptest){
+		//Train-ari InfoGain aplikatu ondoren test-a berarekin bateragarria egiten du
+		//Test-ak train-ari IG aplikatu baino lehen zituen atributuak izan behar ditu
+		train.setClass(train.attribute("klasea"));
+		ptest.setClass(ptest.attribute("klasea"));
 		Remove remove = new Remove();
 		remove.setAttributeIndicesArray(FssInfoGain.selectedAttributes); 
 		remove.setInvertSelection(true); 
@@ -69,11 +75,6 @@ public class Bateratzailea {
 			return null;
 		}
 	}
-	
-	
-	
-	public static void main(String[] args) {
-		Bateratzailea b = new Bateratzailea();
-	}
+
 
 }

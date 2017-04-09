@@ -1,4 +1,4 @@
-package movies_reviews;
+package aurreProzesamendu;
 
 
 import java.util.ArrayList;
@@ -13,8 +13,10 @@ public class Arff2bow {
 
 	
 	public static Instances bagOfWords(Instances data){
+		//Metodo hau ez dugu programa nagusian erabiltzen baina bow ezberdinen datuak lortzeko erabili dugu
 		System.out.println(data.relationName() + " fitxategiaren Bag of Words lortzen...");
 		StringToWordVector filter = new StringToWordVector();
+		filter.setDoNotOperateOnPerClassBasis(true);
 		filter.setWordsToKeep(Integer.MAX_VALUE);
 		filter.setOutputWordCounts(false);
 		filter.setLowerCaseTokens(true);
@@ -54,12 +56,19 @@ public class Arff2bow {
 	}
 	
 	public static ArrayList<Instances> bagOfWords(Instances train, Instances dev, Instances test){
+		//Datuen hiru multzoak hartu eta BOW aplikatzen du
+		// Irteera bezala array bat orden honetan: train, dev, test
+		train.setClass(train.attribute("klasea"));
+		dev.setClass(dev.attribute("klasea"));
+		test.setClass(test.attribute("klasea"));
 		Instances denak = new Instances(train);
 		denak.addAll(dev);
 		denak.addAll(test);
 		ArrayList<Instances> erantzuna = new ArrayList<Instances>();
 		
+		
 		StringToWordVector filter = new StringToWordVector();
+		filter.setDoNotOperateOnPerClassBasis(true);
 		filter.setWordsToKeep(Integer.MAX_VALUE);
 		filter.setOutputWordCounts(false);
 		filter.setLowerCaseTokens(true);
@@ -107,17 +116,53 @@ public class Arff2bow {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Arff2bow a = new Arff2bow();
-
-		Instances newdata= null;
-		try {
-			newdata= a.bagOfWords(ArffKargatu.instantziakIrakurri("devHASIERA.arff"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(args.length !=1 || args.length !=3){
+			System.out.println("Pasatutako parametroak okerrak dira.");
+			System.out.println("Honako agindu hau erabili.");
+			System.out.println("Fitxategi bakarra bihurtzeko:");
+			System.out.println("java -jar arff2bow.jar /path/to/fitx.arff ");
+			System.out.println("Train dev eta test fitxategiak aldi berean bihurtzeko:");
+			System.out.println("java -jar arff2bow.jar /path/to/train.arff /path/to/dev.arff /path/to/test.arff");
+			System.out.println();
+			System.exit(-1);
 		}
-		ArffKargatu.arffSortu("devbow.arff", newdata);
+
+		if(args.length==1){
+			try {
+				Instances databow = Arff2bow.bagOfWords(ArffKargatu.instantziakIrakurri(args[0]));
+				ArffKargatu.arffSortu("bow.arff", databow);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}else{
+			if(args.length==3){
+				try {
+					Instances train = ArffKargatu.instantziakIrakurri(args[0]);
+					Instances dev = ArffKargatu.instantziakIrakurri(args[1]);
+					Instances test = ArffKargatu.instantziakIrakurri(args[2]);
+					ArrayList<Instances> denak = Arff2bow.bagOfWords(train, dev, test);
+					
+					Instances trainbow = denak.get(0);
+					Instances devbow = denak.get(1);
+					Instances testbow= denak.get(2);
+					
+					ArffKargatu.arffSortu("trainBOW.arff", trainbow);
+					ArffKargatu.arffSortu("devBOW.arff", devbow);
+					ArffKargatu.arffSortu("testBOW.arff", testbow);
+
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			}
+			
+		}
+		
+
 
 	}
 
