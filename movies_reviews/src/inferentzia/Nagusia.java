@@ -24,7 +24,7 @@ public class Nagusia {
 			Instances traindev = Inferentzia.sortuTrainDev(train, dev);
 			Inferentzia.inferentzia(train, dev,traindev, classindex);
 			traindev = Inferentzia.sortuTrainDev(train, dev);
-			Inferentzia.inferentziaNB(traindev, classindex);
+			Inferentzia.inferentziaNB(train, dev, traindev, classindex);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

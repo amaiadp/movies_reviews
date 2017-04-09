@@ -19,8 +19,8 @@ public class ParametroEkorketa {
 		double fm;
 		
 		train.setClass(train.attribute("klasea"));		
-		for (double m = 10; m<=100; m=m+10 ){
-			for (int attr = 1; attr <=train.numAttributes(); attr=attr+train.numAttributes()/10){
+		for (double m = 1; m<=train.numAttributes()/2; m=m+5 ){
+			for (int attr = 1; attr <=train.numAttributes()/2; attr=attr+5){
 				RandomForest orain = new RandomForest();
 				try {
 					String[] options = weka.core.Utils.splitOptions("-M "+m+" -K "+attr);
@@ -61,8 +61,6 @@ public class ParametroEkorketa {
 			System.out.println("Evaluating the Classifier with these options: ");
 			String[] op= classifier.getOptions();
 			inprimatumk(op);
-			train.setClass(train.attribute("klasea"));
-			dev.setClass(dev.attribute("klasea"));
 			Evaluation eval= new Evaluation(train);
 			eval.evaluateModel(classifier, dev);
 			double fm =eval.fMeasure(clas) ;
