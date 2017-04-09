@@ -8,7 +8,7 @@ public class Nagusia {
 
 	public static void main(String[] args) {
 		
-		if(args.length !=3 || args.length!=4){
+		if(args.length !=3 && args.length!=4){
 			System.out.println("Pasatutako parametroak okerrak dira.");
 			System.out.println("Honako agindu hau erabili.");
 			System.out.println("java -jar Preprocess.jar /path/to/train /path/to/dev /path/to/test_blind [FSS aukera]");

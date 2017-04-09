@@ -116,7 +116,7 @@ public class Arff2bow {
 	}
 	
 	public static void main(String[] args) {
-		if(args.length !=1 || args.length !=3){
+		if(args.length !=1 && args.length !=3){
 			System.out.println("Pasatutako parametroak okerrak dira.");
 			System.out.println("Honako agindu hau erabili.");
 			System.out.println("Fitxategi bakarra bihurtzeko:");
