@@ -19,7 +19,7 @@ public class ParametroEkorketa {
 		double fm;
 		
 		train.setClass(train.attribute("klasea"));		
-		for (double m = 1; m<=train.numAttributes()/2; m=m+5 ){
+		for (double m = 6; m<=train.numAttributes()/2; m=m+5 ){
 			for (int attr = 1; attr <=train.numAttributes()/2; attr=attr+5){
 				RandomForest orain = new RandomForest();
 				try {

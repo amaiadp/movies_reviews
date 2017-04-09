@@ -1,5 +1,7 @@
 package inferentzia;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,8 +16,9 @@ import weka.filters.unsupervised.instance.RemovePercentage;
 
 public class Inferentzia {
 	
-	private String txtan = "";
-
+	private static String txtNB = "";
+	private static String txtRF = "";
+	
 	public static void inferentzia(Instances train, Instances dev, Instances traindev, int clas){
 		RandomForest params = ParametroEkorketa.parametroEkorketa(train, dev, clas);
 		String[] opt = params.getOptions();
@@ -33,11 +36,21 @@ public class Inferentzia {
 		}
 	}
 	
+	private static void txtinp(String inp, String non){
+		if (non.equals("NB")){
+			txtNB += "\n" +inp;
+		}
+		else{
+			txtRF += "\n" +inp;
+		}
+		
+		System.out.println(inp);
+	}
+	
 	public static void inferentziaNB(Instances train, Instances dev, Instances traindev, int clas){
 		NaiveBayes nb = new NaiveBayes();
 		ArffKargatu.arffSortu("traindev.arff", traindev);
 		try {
-			System.out.println(nb.toString());
 			ebaluatuNB(train, dev, traindev, clas);
 			nb.buildClassifier(traindev);
 			sortuModeloa(nb, "NaiveBayes.model");
@@ -50,16 +63,16 @@ public class Inferentzia {
 	private static void ebaluatuNB(Instances train, Instances dev, Instances traindev, int clas) {
 		try {
 			NaiveBayes nb = new NaiveBayes();
-			System.out.println("NaiveBayes Ez-Zintzoa:");
-			ezzintzoa(nb, traindev, clas);
+			txtinp("NaiveBayes Ez-Zintzoa:", "NB");
+			ezzintzoa(nb, traindev, clas, "NB");
 			nb = new NaiveBayes();
-			System.out.println("NaiveBayes 10 Cross-Validation:");
-			tencross(nb, traindev, clas);
-			System.out.println("NaiveBayes Hold Out:");
+			txtinp("NaiveBayes 10 Cross-Validation:", "NB");
+			tencross(nb, traindev, clas, "NB");
+			txtinp("NaiveBayes Hold Out:", "NB");
 			holdoutNB(traindev, clas);
 			nb = new NaiveBayes();
-			System.out.println("NaiveBayes Hold Out (Train vs. Dev)");
-			holdouttvsd(nb, train, dev, clas);
+			txtinp("NaiveBayes Hold Out (Train vs. Dev)", "NB");
+			holdouttvsd(nb, train, dev, clas, "NB");
 			 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -90,21 +103,20 @@ public class Inferentzia {
 	
 	public static void ebaluatu(RandomForest cl, Instances train, Instances dev, Instances traindev, int clas){
 		try {
-			System.out.println("Klase minoritarioa: "+ clas);
 			RandomForest rf = new RandomForest();
 			rf.setOptions(cl.getOptions());
-			System.out.println("\nRandomForest Ez Zintzoa:");
-			ezzintzoa(rf, traindev, clas);
+			txtinp("\nRandomForest Ez Zintzoa:", "RF");
+			ezzintzoa(rf, traindev, clas, "RF");
 			rf = new RandomForest();
 			rf.setOptions(cl.getOptions());
-			System.out.println("\nRandomForest 10 Cross-Validation:");
-			tencross(rf, traindev, clas);
-			System.out.println("\nRandomForest Hold Out:");
+			txtinp("\nRandomForest 10 Cross-Validation:", "RF");
+			tencross(rf, traindev, clas, "RF");
+			txtinp("\nRandomForest Hold Out:", "RF");
 			holdout(traindev, clas, cl.getOptions());
 			rf = new RandomForest();
 			rf.setOptions(cl.getOptions());
-			System.out.println("\nRandomForest Hold Out (Train vs. Dev)");
-			holdouttvsd(rf, train, dev, clas);
+			txtinp("\nRandomForest Hold Out (Train vs. Dev)", "RF");
+			holdouttvsd(rf, train, dev, clas, "RF");
 			 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -112,12 +124,12 @@ public class Inferentzia {
 		}
 	}
 	
-	private static void holdouttvsd(Classifier cl, Instances train, Instances dev, int clas){
+	private static void holdouttvsd(Classifier cl, Instances train, Instances dev, int clas, String non){
 		try{
 			cl.buildClassifier(train);
 			Evaluation eval= new Evaluation(train);
 			eval.evaluateModel(cl, dev);
-			inprimatu(eval, clas);
+			inprimatu(eval, clas, non);
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -179,7 +191,7 @@ public class Inferentzia {
 		        r1.add(eval.recall(1));
 		        rw.add(eval.weightedRecall());
 			}
-			inprimatu2(fm0,fm1,fmw,p0,p1,pw,r0,r1,rw);
+			inprimatu2(fm0,fm1,fmw,p0,p1,pw,r0,r1,rw, "RF");
 			
 		} catch (Exception e){
 			e.printStackTrace();
@@ -225,62 +237,62 @@ public class Inferentzia {
 		        rw.add(eval.weightedRecall());
 		        
 			}
-			inprimatu2(fm0,fm1,fmw,p0,p1,pw,r0,r1,rw);
+			inprimatu2(fm0,fm1,fmw,p0,p1,pw,r0,r1,rw, "NB");
 			
 		} catch (Exception e){
 			e.printStackTrace();
 		}
 	}
 	
-	private static void inprimatu2(ArrayList<Double> fm0, ArrayList<Double> fm1, ArrayList<Double> fmw,ArrayList<Double> p0, ArrayList<Double> p1, ArrayList<Double> pw,ArrayList<Double> r0, ArrayList<Double> r1, ArrayList<Double> rw){
+	private static void inprimatu2(ArrayList<Double> fm0, ArrayList<Double> fm1, ArrayList<Double> fmw,ArrayList<Double> p0, ArrayList<Double> p1, ArrayList<Double> pw,ArrayList<Double> r0, ArrayList<Double> r1, ArrayList<Double> rw, String non){
 		double fmedia = getMean(fm0);
 		double fvar = getVariance(fm0, fmedia);
 		double fdes = getStdDev(fvar);
-		System.out.println("\nFmeasure(0)-ren bataz bestekoa: "+fmedia);
-		System.out.println("Fmeasure(0)-ren desbiderapena: "+ fdes);
+		txtinp("\nFmeasure(0)-ren bataz bestekoa: "+fmedia, non);
+		txtinp("Fmeasure(0)-ren desbiderapena: "+ fdes, non);
 		fmedia = getMean(fm1);
 		fvar= getVariance(fm1, fmedia);
 		fdes = getStdDev(fvar);
-		System.out.println("Fmeasure(1)-ren bataz bestekoa: "+fmedia);
-		System.out.println("Fmeasure(1)-ren desbiderapena: "+ fdes);
+		txtinp("\nFmeasure(1)-ren bataz bestekoa: "+fmedia, non);
+		txtinp("Fmeasure(1)-ren desbiderapena: "+ fdes, non);
 		fmedia = getMean(fmw);
 		fvar= getVariance(fmw, fmedia);
 		fdes = getStdDev(fvar);
-		System.out.println("Weighted Fmeasure-ren bataz bestekoa: "+fmedia);
-		System.out.println("WeightedFmeasure-ren desbiderapena: "+ fdes+"\n");
+		txtinp("\nWeighted Fmeasure-ren bataz bestekoa: "+fmedia, non);
+		txtinp("WeightedFmeasure-ren desbiderapena: "+ fdes+"\n", non);
 		double pmedia = getMean(p0);
 		double pvar = getVariance(p0, pmedia);
 		double pdes = getStdDev(pvar);
-		System.out.println("\nPrecision(0)-ren bataz bestekoa: "+pmedia);
-		System.out.println("Precision(0)-ren desbiderapena: "+ pdes);
+		txtinp("\nPrecision(0)-ren bataz bestekoa: "+pmedia, non);
+		txtinp("Precision(0)-ren desbiderapena: "+ pdes, non);
 		pmedia = getMean(p1);
 		pvar= getVariance(p1, pmedia);
 		pdes = getStdDev(pvar);
-		System.out.println("Precision(1)-ren bataz bestekoa: "+pmedia);
-		System.out.println("Precision(1)-ren desbiderapena: "+ pdes);
+		txtinp("\nPrecision(1)-ren bataz bestekoa: "+pmedia, non);
+		txtinp("Precision(1)-ren desbiderapena: "+ pdes, non);
 		pmedia = getMean(pw);
 		pvar= getVariance(pw, pmedia);
 		pdes = getStdDev(pvar);
-		System.out.println("Weighted Precision-ren bataz bestekoa: "+pmedia);
-		System.out.println("Weighted Precision-ren desbiderapena: "+ pdes+"\n");
+		txtinp("\nWeighted Precision-ren bataz bestekoa: "+pmedia, non);
+		txtinp("Weighted Precision-ren desbiderapena: "+ pdes+"\n", non);
 		double rmedia = getMean(r0);
 		double rvar = getVariance(r0, rmedia);
 		double rdes = getStdDev(rvar);
-		System.out.println("\nRecall(0)-ren bataz bestekoa: "+rmedia);
-		System.out.println("Recall(0)-ren desbiderapena: "+ rdes);
+		txtinp("\nRecall(0)-ren bataz bestekoa: "+rmedia, non);
+		txtinp("Recall(0)-ren desbiderapena: "+ rdes, non);
 		rmedia = getMean(r1);
 		rvar= getVariance(r1, rmedia);
 		rdes = getStdDev(rvar);
-		System.out.println("Recall(1)-ren bataz bestekoa: "+rmedia);
-		System.out.println("Recall(1)-ren desbiderapena: "+ rdes);
+		txtinp("\nRecall(1)-ren bataz bestekoa: "+rmedia, non);
+		txtinp("Recall(1)-ren desbiderapena: "+ rdes, non);
 		rmedia = getMean(rw);
 		rvar= getVariance(rw, rmedia);
 		rdes = getStdDev(rvar);
-		System.out.println("Weighted Recall-ren bataz bestekoa: "+rmedia);
-		System.out.println("Weighted Recall-ren desbiderapena: "+ rdes+"\n");
+		txtinp("\nWeighted Recall-ren bataz bestekoa: "+rmedia, non);
+		txtinp("Weighted Recall-ren desbiderapena: "+ rdes+"\n", non);
 	}
 	
-	private static void tencross(Classifier cl, Instances data, int clas) {
+	private static void tencross(Classifier cl, Instances data, int clas, String non) {
 		Evaluation eval;
 		try {
 			ArrayList<Double> fm0 = new ArrayList<Double>();
@@ -306,7 +318,7 @@ public class Inferentzia {
 		        r1.add(eval.recall(1));
 		        rw.add(eval.weightedRecall());
 			}
-			inprimatu2(fm0,fm1,fmw,p0,p1,pw,r0,r1,rw);
+			inprimatu2(fm0,fm1,fmw,p0,p1,pw,r0,r1,rw, non);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -316,29 +328,29 @@ public class Inferentzia {
 		
 	}
 
-	private static void ezzintzoa(Classifier cl, Instances data, int clas){
+	private static void ezzintzoa(Classifier cl, Instances data, int clas, String non){
 		Evaluation eval;
 		try {
 			eval = new Evaluation(data);
 			cl.buildClassifier(data);
 			eval.evaluateModel(cl, data);
-			inprimatu(eval,clas);
+			inprimatu(eval,clas, non);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private static void inprimatu(Evaluation eval, int clas) {
-		System.out.println("F-measure0: " +eval.fMeasure(0));
-		System.out.println("Precision0: "+ eval.precision(0));
-		System.out.println("Recall0: " +eval.recall(0));
-		System.out.println("\nF-measure1: " +eval.fMeasure(1));
-		System.out.println("Precision1: "+ eval.precision(1));
-		System.out.println("Recall1: " +eval.recall(1));
-		System.out.println("\nF-measurew: " +eval.weightedFMeasure());
-		System.out.println("Precisionw: "+ eval.weightedPrecision());
-		System.out.println("Recallw: " +eval.weightedRecall());
+	private static void inprimatu(Evaluation eval, int clas, String non) {
+		txtinp("\nF-measure0: " +eval.fMeasure(0), non);
+		txtinp("Precision0: "+ eval.precision(0), non);
+		txtinp("Recall0: " +eval.recall(0), non);
+		txtinp("\nF-measure1: " +eval.fMeasure(1), non);
+		txtinp("Precision1: "+ eval.precision(1), non);
+		txtinp("Recall1: " +eval.recall(1), non);
+		txtinp("\nF-measurew: " +eval.weightedFMeasure(), non);
+		txtinp("Precisionw: "+ eval.weightedPrecision(), non);
+		txtinp("Recallw: " +eval.weightedRecall(), non);
 		
 	}
 	public static void main(String[] args) {
@@ -353,4 +365,18 @@ public class Inferentzia {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void sortuFitxategiak(){
+		try{
+		    PrintWriter writer = new PrintWriter("EvaluationNaiveBayes.txt", "UTF-8");
+		    writer.println(txtNB);
+		    writer.close();
+		    writer = new PrintWriter("EvaluationRandomForest.txt", "UTF-8");
+		    writer.println(txtRF);
+		    writer.close();
+		} catch (IOException e) {
+		   // do something
+		}
+	}
+	
 }

@@ -25,6 +25,7 @@ public class Nagusia {
 			Inferentzia.inferentzia(train, dev,traindev, classindex);
 			traindev = Inferentzia.sortuTrainDev(train, dev);
 			Inferentzia.inferentziaNB(train, dev, traindev, classindex);
+			Inferentzia.sortuFitxategiak();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
